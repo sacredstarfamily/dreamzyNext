@@ -38,27 +38,28 @@ const apiMethods = {
     registerUser: async (newUserData:UserFormDataType): Promise<APIResponse<UserType>> => {
         let data;
         let error;
-        try {
-            const response = await apiClientNoAuth().post('/register', { username, password });
-            return { data: response.data };
-        } catch (error) {
-            return { error: error.response.data };
+        const registerData = {
+            "firstName": newUserData.first_name,
+            "lastName": newUserData.last_name,
+            "email": newUserData.email,
+            "username": newUserData.username,
+            "password": newUserData.password,
         }
+        try{
+            const response = await apiClientNoAuth().post(userEndpoint, registerData);
+            data = response.data
+        } catch(err) {
+            if (axios.isAxiosError(err)){
+                error = err.response?.data.error
+            } else {
+                error = 'Something went wrong'
+            }
+        }
+        return { data, error }
+    
     },
     // Example method for apiClientNoAuth
-    getNoAuthData: async (): Promise<AxiosResponse> => {
-        return apiClientNoAuth.get('/endpoint');
-    },
-
-    // Example method for apiClientBasicAuth
-    getBasicAuthData: (): Promise<AxiosResponse> => {
-        return apiClientBasicAuth.get('/endpoint');
-    },
-
-    // Example method for apiClientTokenAuth
-    getTokenAuthData: (): Promise<AxiosResponse> => {
-        return apiClientTokenAuth.get('/endpoint');
-    },
+   
 };
 
 export default apiMethods;
