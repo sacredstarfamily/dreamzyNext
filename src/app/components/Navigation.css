@@ -1,0 +1,72 @@
+/* Navigation.css */
+
+/* Styles for the navigation container */
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f2f2f2;
+    padding: 10px;
+}
+
+/* Styles for the navigation links */
+.navigation a {
+    text-decoration: none;
+    color: #333;
+    margin-right: 10px;
+}
+
+/* Style for the active link */
+.navigation a.active {
+    font-weight: bold;
+}
+
+/* Styles for the navigation logo */
+.navigation .logo {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Styles for the navigation menu */
+.navigation .menu {
+    display: flex;
+    align-items: center;
+}
+
+/* Styles for the navigation menu items */
+.navigation .menu li {
+    list-style: none;
+    margin-right: 10px;
+}
+
+/* Styles for the navigation menu toggle button */
+.navigation .menu-toggle {
+    display: none;
+}
+
+/* Media query for responsive navigation */
+@media (max-width: 768px) {
+    .navigation .menu {
+        display: none;
+    }
+
+    .navigation .menu-toggle {
+        display: block;
+        cursor: pointer;
+    }
+
+    .navigation .menu-toggle:before {
+        content: "\2630";
+        font-size: 20px;
+    }
+
+    .navigation .menu-toggle.active:before {
+        content: "\2715";
+    }
+
+    .navigation .menu-toggle.active ~ .menu {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model alembic_version {
+  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
+}
+
+model dream {
+  id             Int              @id @default(autoincrement())
+  dream          String?          @db.VarChar(6000)
+  exclusivity    exclusivity?
+  sleep_start    String?          @db.VarChar
+  sleep_end      String?          @db.VarChar
+  keywords       String[]         @db.VarChar
+  log_date       DateTime?        @db.Timestamp(6)
+  likes          Int?
+  user_id        Int?
+  who_liked      String[]         @db.VarChar
+  user           user?            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  interpretation interpretation[]
+
+  @@index([keywords], map: "ix_dream_keywords")
+  @@index([log_date], map: "ix_dream_log_date")
+}
+
+model friends {
+  id                           Int   @id @default(autoincrement())
+  friend_id                    Int?
+  user_id                      Int?
+  user_friends_friend_idTouser user? @relation("friends_friend_idTouser", fields: [friend_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_friends_user_idTouser   user? @relation("friends_user_idTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model interpretation {
+  id             Int          @id @default(autoincrement())
+  interpretation String?      @db.VarChar(6000)
+  log_date       DateTime?    @db.Timestamp(6)
+  dream_id       Int?
+  exclusivity    exclusivity?
+  interpreter_id Int?
+  dream          dream?       @relation(fields: [dream_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user           user?        @relation(fields: [interpreter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([log_date], map: "ix_interpretation_log_date")
+}
+
+model message {
+  id                             Int       @id @default(autoincrement())
+  message                        String?   @db.VarChar(6000)
+  log_date                       DateTime? @db.Timestamp(6)
+  sender_id                      Int?
+  receiver_id                    Int?
+  user_message_receiver_idTouser user?     @relation("message_receiver_idTouser", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_message_sender_idTouser   user?     @relation("message_sender_idTouser", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([log_date], map: "ix_message_log_date")
+}
+
+model user {
+  id                                Int              @id @default(autoincrement())
+  first_name                        String           @db.VarChar
+  last_name                         String           @db.VarChar
+  email                             String?          @unique(map: "ix_user_email") @db.VarChar
+  username                          String?          @unique(map: "ix_user_username") @db.VarChar
+  password                          String?          @db.VarChar(528)
+  location                          String?          @db.VarChar(64)
+  token                             String?          @unique(map: "ix_user_token") @db.VarChar
+  token_expiration                  DateTime?        @db.Timestamptz(6)
+  liked_dreams                      Int[]
+  dream                             dream[]
+  friends_friends_friend_idTouser   friends[]        @relation("friends_friend_idTouser")
+  friends_friends_user_idTouser     friends[]        @relation("friends_user_idTouser")
+  interpretation                    interpretation[]
+  message_message_receiver_idTouser message[]        @relation("message_receiver_idTouser")
+  message_message_sender_idTouser   message[]        @relation("message_sender_idTouser")
+}
+
+enum exclusivity {
+  PUBLIC
+  EXCLUSIVE
+  PRIVATE
+}
